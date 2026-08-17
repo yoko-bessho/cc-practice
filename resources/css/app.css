@@ -1,0 +1,52 @@
+body {
+    font-family: sans-serif;
+    color: #1f2937;
+}
+
+.container {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+th,
+td {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
+.field input,
+.field textarea,
+.field select {
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.error {
+    color: #dc2626;
+}
+
+.flash {
+    background-color: #ecfdf5;
+    border: 1px solid #10b981;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
