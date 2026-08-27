@@ -36,10 +36,26 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
-          # プロジェクト規約（コミットメッセージ・コメントは日本語、PSR-12 準拠、
-          # テストは PHPUnit、Sail 経由でコマンド実行）は CLAUDE.md を参照させる
-          # claude_args: |
-          #   --system-prompt "CLAUDE.md のプロジェクト規約に従うこと"
+          # @claude メンション時は日本語でレビューさせる。
+          # トリガーになった issue / PR / コメントの内容は Claude に渡される
+          prompt: |
+            REPO: ${{ github.repository }}
+            NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+
+            この issue / PR を日本語でレビューしてください。以下の観点で確認します:
+            - コードの品質とベストプラクティス
+            - 潜在的なバグやエッジケースの考慮漏れ
+            - パフォーマンス上の懸念（N+1 クエリなど）
+            - セキュリティ上の懸念
+            - テストのカバレッジ（PHPUnit）
+
+            リポジトリの規約は CLAUDE.md に従うこと（PSR-12 準拠、コメントは「なぜ」を日本語で）。
+            具体的な指摘は inline comment で、全体的な所感は top-level comment で伝えてください。
+
+          # モデルと最大ターン数を指定（deprecated な model / max_turns 入力ではなく claude_args で渡す）
+          claude_args: |
+            --model claude-sonnet-4-6
+            --max-turns 5
 
           # 任意: トリガーフレーズの変更（デフォルト: @claude）
           # trigger_phrase: "/claude"
