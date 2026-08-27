@@ -7,6 +7,16 @@
 
     <p><a href="{{ route('daily_reports.create') }}">新規作成</a></p>
 
+    <form method="GET" action="{{ route('daily_reports.index') }}">
+        <label for="status">ステータス</label>
+        <select name="status" id="status">
+            <option value="" @selected($status === null)>全て</option>
+            <option value="draft" @selected($status === 'draft')>下書きのみ</option>
+            <option value="submitted" @selected($status === 'submitted')>提出済のみ</option>
+        </select>
+        <button type="submit">絞り込む</button>
+    </form>
+
     @forelse ($dailyReports as $dailyReport)
         @if ($loop->first)
             <table>

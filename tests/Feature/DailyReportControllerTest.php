@@ -20,6 +20,54 @@ class DailyReportControllerTest extends TestCase
         $response->assertSee('テスト日報タイトル');
     }
 
+    public function test_ステータスで下書きのみに絞り込むと下書きの日報だけ表示される(): void
+    {
+        DailyReport::factory()->create(['title' => '下書きの日報', 'status' => 'draft']);
+        DailyReport::factory()->create(['title' => '提出済の日報', 'status' => 'submitted']);
+
+        $response = $this->get(route('daily_reports.index', ['status' => 'draft']));
+
+        $response->assertStatus(200);
+        $response->assertSee('下書きの日報');
+        $response->assertDontSee('提出済の日報');
+    }
+
+    public function test_ステータスで提出済のみに絞り込むと提出済の日報だけ表示される(): void
+    {
+        DailyReport::factory()->create(['title' => '下書きの日報', 'status' => 'draft']);
+        DailyReport::factory()->create(['title' => '提出済の日報', 'status' => 'submitted']);
+
+        $response = $this->get(route('daily_reports.index', ['status' => 'submitted']));
+
+        $response->assertStatus(200);
+        $response->assertSee('提出済の日報');
+        $response->assertDontSee('下書きの日報');
+    }
+
+    public function test_ステータスを指定しない場合は全ての日報が表示される(): void
+    {
+        DailyReport::factory()->create(['title' => '下書きの日報', 'status' => 'draft']);
+        DailyReport::factory()->create(['title' => '提出済の日報', 'status' => 'submitted']);
+
+        $response = $this->get(route('daily_reports.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('下書きの日報');
+        $response->assertSee('提出済の日報');
+    }
+
+    public function test_想定外のステータスを指定した場合は全ての日報が表示される(): void
+    {
+        DailyReport::factory()->create(['title' => '下書きの日報', 'status' => 'draft']);
+        DailyReport::factory()->create(['title' => '提出済の日報', 'status' => 'submitted']);
+
+        $response = $this->get(route('daily_reports.index', ['status' => 'unknown']));
+
+        $response->assertStatus(200);
+        $response->assertSee('下書きの日報');
+        $response->assertSee('提出済の日報');
+    }
+
     public function test_新規作成画面が表示される(): void
     {
         $response = $this->get(route('daily_reports.create'));
