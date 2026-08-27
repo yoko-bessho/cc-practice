@@ -19,7 +19,7 @@
 
     @forelse ($dailyReports as $dailyReport)
         @if ($loop->first)
-            <table>
+            <table class="table-striped">
                 <thead>
                     <tr>
                         <th>日付</th>
@@ -33,7 +33,11 @@
                     <tr>
                         <td>{{ $dailyReport->date->format('Y-m-d') }}</td>
                         <td>{{ $dailyReport->title }}</td>
-                        <td>{{ $dailyReport->status === 'draft' ? '下書き' : '提出済' }}</td>
+                        <td>
+                            <span class="badge {{ $dailyReport->status === 'draft' ? 'badge-draft' : 'badge-submitted' }}">
+                                {{ $dailyReport->status === 'draft' ? '下書き' : '提出済' }}
+                            </span>
+                        </td>
                         <td>
                             <a href="{{ route('daily_reports.edit', $dailyReport) }}">編集</a>
                             <form method="POST" action="{{ route('daily_reports.destroy', $dailyReport) }}" onsubmit="return confirm('本当に削除しますか？');">
