@@ -7,15 +7,25 @@ use App\Http\Requests\UpdateDailyReportRequest;
 use App\Models\DailyReport;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class DailyReportController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        // 同一日付の日報が複数あっても表示順が安定するよう id を第2ソートキーにする
-        $dailyReports = DailyReport::orderByDesc('date')->orderByDesc('id')->get();
+        // 想定外の値が来てもビューの選択状態と絞り込み結果がずれないよう「全て」(null)に丸める
+        $status = in_array($request->query('status'), ['draft', 'submitted'], true)
+            ? $request->query('status')
+            : null;
 
-        return view('daily_reports.index', compact('dailyReports'));
+        $dailyReports = DailyReport::query()
+            ->when($status !== null, fn ($query) => $query->where('status', $status))
+            // 同一日付の日報が複数あっても表示順が安定するよう id を第2ソートキーにする
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('daily_reports.index', compact('dailyReports', 'status'));
     }
 
     public function create(): View
