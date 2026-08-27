@@ -1,0 +1,9 @@
+{
+  "name": "cc-practice-review",
+  "version": "0.1.0",
+  "description": "Laravel プロジェクトのコードレビューを支援する Plugin",
+  "author": {
+    "name": "yoko bessho"
+  },
+  "keywords": ["laravel", "code-review", "psr-12", "php"]
+}

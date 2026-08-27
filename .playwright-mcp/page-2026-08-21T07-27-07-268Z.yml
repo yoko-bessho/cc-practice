@@ -1,0 +1,21 @@
+- generic [ref=e2]:
+  - heading "日報編集" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: 日付
+      - textbox "日付" [ref=e7]: 2026-08-18
+    - generic [ref=e8]:
+      - generic [ref=e9]: タイトル
+      - textbox "タイトル" [ref=e10]: flush
+    - generic [ref=e11]:
+      - generic [ref=e12]: 内容
+      - textbox "内容" [ref=e13]: 登録時などのああああああ
+    - generic [ref=e14]:
+      - generic [ref=e15]: ステータス
+      - combobox "ステータス" [ref=e16]:
+        - option "下書き" [selected]
+        - option "提出済"
+    - button "保存" [ref=e17]
+  - paragraph [ref=e18]:
+    - link "一覧に戻る" [ref=e19] [cursor=pointer]:
+      - /url: http://localhost/daily_reports
