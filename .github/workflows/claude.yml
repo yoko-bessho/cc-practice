@@ -1,5 +1,8 @@
 name: Claude Code
 
+# @claude メンション（issue / PR コメント、issue 本文・タイトル）に応答する専用ワークフロー。
+# レビュー・修正・質問など、依頼された内容をそのまま実行する。
+# PR の自動レビューは claude-code-review.yml が担当し、ここでは扱わない（役割を分離して重複を避ける）。
 on:
   issue_comment:
     types: [created]
@@ -19,7 +22,7 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # 依頼に応じてコード修正・コミットする可能性があるため write
       pull-requests: write
       issues: write
       id-token: write
@@ -36,26 +39,13 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
-          # @claude メンション時は日本語でレビューさせる。
-          # トリガーになった issue / PR / コメントの内容は Claude に渡される
-          prompt: |
-            REPO: ${{ github.repository }}
-            NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
-
-            この issue / PR を日本語でレビューしてください。以下の観点で確認します:
-            - コードの品質とベストプラクティス
-            - 潜在的なバグやエッジケースの考慮漏れ
-            - パフォーマンス上の懸念（N+1 クエリなど）
-            - セキュリティ上の懸念
-            - テストのカバレッジ（PHPUnit）
-
-            リポジトリの規約は CLAUDE.md に従うこと（PSR-12 準拠、コメントは「なぜ」を日本語で）。
-            具体的な指摘は inline comment で、全体的な所感は top-level comment で伝えてください。
-
-          # モデルと最大ターン数を指定（deprecated な model / max_turns 入力ではなく claude_args で渡す）
+          # prompt は指定しない: @claude に続けて書かれた依頼内容をそのまま実行させる。
+          # 日本語での応答は固定 prompt ではなく --append-system-prompt で指定し、
+          # 対話的な挙動（レビュー・修正・質問対応）を保つ。
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 5
+            --append-system-prompt "常に日本語で回答すること。コードのコメントやコミットメッセージも日本語で書く（CLAUDE.md の規約に従う）。"
 
           # 任意: トリガーフレーズの変更（デフォルト: @claude）
           # trigger_phrase: "/claude"
