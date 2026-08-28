@@ -18,6 +18,7 @@ class DailyReportController extends Controller
             ? $request->query('status')
             : null;
 
+        // 日報は運用上そこまで件数が増えない想定のため、ページネーションせず全件取得する
         $dailyReports = DailyReport::query()
             ->when($status !== null, fn ($query) => $query->where('status', $status))
             // 同一日付の日報が複数あっても表示順が安定するよう id を第2ソートキーにする
