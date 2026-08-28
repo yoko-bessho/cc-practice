@@ -25,6 +25,10 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
+          # 一時的な調査用: レビュー失敗の実エラー内容を Actions ログに出す。
+          # public リポジトリではログが公開されるため、原因特定後は false に戻すこと。
+          show_full_output: true
+
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
