@@ -1,0 +1,54 @@
+name: Claude Code
+
+# @claude メンション（issue / PR コメント、issue 本文・タイトル）に応答する専用ワークフロー。
+# レビュー・修正・質問など、依頼された内容をそのまま実行する。
+# PR の自動レビューは claude-code-review.yml が担当し、ここでは扱わない（役割を分離して重複を避ける）。
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 依頼に応じてコード修正・コミットする可能性があるため write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read # Claude が PR の CI 結果を読むために必要
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # prompt は指定しない: @claude に続けて書かれた依頼内容をそのまま実行させる。
+          # 日本語での応答は固定 prompt ではなく --append-system-prompt で指定し、
+          # 対話的な挙動（レビュー・修正・質問対応）を保つ。
+          claude_args: |
+            --model claude-sonnet-4-6
+            --max-turns 5
+            --append-system-prompt "常に日本語で回答すること。コードのコメントやコミットメッセージも日本語で書く（CLAUDE.md の規約に従う）。"
+
+          # 任意: トリガーフレーズの変更（デフォルト: @claude）
+          # trigger_phrase: "/claude"
+
+          # 任意: issue の担当者アサインでトリガー
+          # assignee_trigger: "claude-bot"
